@@ -1,0 +1,8 @@
+{
+  "name": "AI Bill Splitter",
+  "description": "An intelligent bill splitting app that uses AI to parse receipts and a chat interface to assign items. Upload a receipt, and tell the AI who had what to get a real-time breakdown of what everyone owes, including proportional tax and tip.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
