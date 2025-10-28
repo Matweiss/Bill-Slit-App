@@ -42,4 +42,5 @@ export interface Bill {
   diners: string[];
   dinerTips: { [key: string]: number };
   dinerSettlement: { [key: string]: boolean };
+  gratuityIncluded?: boolean;
 }

@@ -9,10 +9,13 @@ interface ChatInterfaceProps {
   onDinerTipChange: (name: string, percentage: number) => void;
   isLoading: boolean;
   onToggleSettleStatus: (name: string) => void;
+  onToggleGratuityIncluded: () => void;
+  onApplyTipToAll: (percentage: number) => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
-    bill, onDinerTipChange, isLoading, onToggleSettleStatus
+const ChatInterface: React.FC<ChatInterfaceProps> = ({
+    bill, onDinerTipChange, isLoading, onToggleSettleStatus,
+    onToggleGratuityIncluded, onApplyTipToAll
 }) => {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -53,14 +56,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
       </div>
 
-      <SummaryView 
-        totals={totals} 
-        dinerTips={bill.dinerTips} 
-        onDinerTipChange={onDinerTipChange} 
+      <SummaryView
+        totals={totals}
+        dinerTips={bill.dinerTips}
+        onDinerTipChange={onDinerTipChange}
         receipt={bill.parsedReceipt!}
         assignments={bill.assignments}
         settlementStatus={bill.dinerSettlement}
         onToggleSettlement={onToggleSettleStatus}
+        gratuityIncluded={bill.gratuityIncluded || false}
+        onToggleGratuityIncluded={onToggleGratuityIncluded}
+        onApplyTipToAll={onApplyTipToAll}
       />
     </div>
   );

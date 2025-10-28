@@ -73,6 +73,7 @@ const App: React.FC = () => {
         diners: [...newBillDiners],
         dinerTips,
         dinerSettlement,
+        gratuityIncluded: false,
     };
 
     const reader = new FileReader();
@@ -260,6 +261,18 @@ const App: React.FC = () => {
     ...bill, dinerSettlement: { ...bill.dinerSettlement, [name]: !bill.dinerSettlement[name] }
   }));
 
+  const handleToggleGratuityIncluded = () => updateActiveBill(bill => ({
+    ...bill, gratuityIncluded: !bill.gratuityIncluded
+  }));
+
+  const handleApplyTipToAll = (percentage: number) => updateActiveBill(bill => {
+    const updatedTips = { ...bill.dinerTips };
+    bill.diners.forEach(diner => {
+      updatedTips[diner] = percentage;
+    });
+    return { ...bill, dinerTips: updatedTips };
+  });
+
   const handleAddStagedDiner = (name: string) => {
     if (name && !newBillDiners.includes(name)) {
         setNewBillDiners(prev => [...prev, name]);
@@ -329,6 +342,8 @@ const App: React.FC = () => {
                 onDinerTipChange={handleDinerTipChange}
                 isLoading={isLoading}
                 onToggleSettleStatus={handleToggleSettleStatus}
+                onToggleGratuityIncluded={handleToggleGratuityIncluded}
+                onApplyTipToAll={handleApplyTipToAll}
               />
             </div>
           </div>

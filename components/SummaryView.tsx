@@ -10,13 +10,18 @@ interface SummaryViewProps {
   assignments: Assignment[];
   settlementStatus: { [key: string]: boolean };
   onToggleSettlement: (name: string) => void;
+  gratuityIncluded: boolean;
+  onToggleGratuityIncluded: () => void;
+  onApplyTipToAll: (percentage: number) => void;
 }
 
-const SummaryView: React.FC<SummaryViewProps> = ({ 
-    totals, dinerTips, onDinerTipChange, receipt, assignments, 
-    settlementStatus, onToggleSettlement 
+const SummaryView: React.FC<SummaryViewProps> = ({
+    totals, dinerTips, onDinerTipChange, receipt, assignments,
+    settlementStatus, onToggleSettlement, gratuityIncluded,
+    onToggleGratuityIncluded, onApplyTipToAll
 }) => {
     const [isExpanded, setIsExpanded] = useState(true);
+    const [globalTipPercentage, setGlobalTipPercentage] = useState(18);
     
     const getItemsForPerson = (personName: string) => {
         return assignments
@@ -46,6 +51,52 @@ const SummaryView: React.FC<SummaryViewProps> = ({
                     {totals.length === 0 ? (
                         <p className="text-slate-500 text-center py-4">Assign items to see the breakdown.</p>
                     ) : (
+                        <>
+                            {/* Global tip controls */}
+                            <div className="mb-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                                <div className="flex items-center justify-between mb-3">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={gratuityIncluded}
+                                            onChange={onToggleGratuityIncluded}
+                                            className="w-4 h-4 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
+                                        />
+                                        <span className="text-sm font-semibold text-slate-700">
+                                            Gratuity Included in Bill
+                                        </span>
+                                    </label>
+                                </div>
+
+                                {!gratuityIncluded && totals.length > 1 && (
+                                    <div className="border-t border-indigo-200 pt-3">
+                                        <label htmlFor="global-tip" className="block text-sm font-medium text-slate-700 mb-2">
+                                            Apply tip to all diners ({globalTipPercentage}%)
+                                        </label>
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                id="global-tip"
+                                                type="range"
+                                                min="0"
+                                                max="30"
+                                                step="1"
+                                                value={globalTipPercentage}
+                                                onChange={(e) => setGlobalTipPercentage(parseInt(e.target.value, 10))}
+                                                className="flex-grow h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                                            />
+                                            <button
+                                                onClick={() => onApplyTipToAll(globalTipPercentage)}
+                                                className="px-4 py-1.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors whitespace-nowrap"
+                                            >
+                                                Apply to All
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+                    {totals.length > 0 && (
                         <ul className="space-y-4">
                             {totals.map(person => {
                                 const tipPercentage = dinerTips[person.name] ?? 18;
@@ -103,6 +154,7 @@ const SummaryView: React.FC<SummaryViewProps> = ({
                                             <label htmlFor={`tip-${person.name}`} className="block text-sm font-medium text-slate-700 mb-1">
                                                 Tip ({tipPercentage}%)
                                                 <span className="font-mono text-slate-500 ml-2">${person.tip.toFixed(2)}</span>
+                                                {gratuityIncluded && <span className="text-xs text-slate-500 ml-2">(Gratuity included)</span>}
                                             </label>
                                             <input
                                                 id={`tip-${person.name}`}
@@ -113,7 +165,7 @@ const SummaryView: React.FC<SummaryViewProps> = ({
                                                 value={tipPercentage}
                                                 onChange={(e) => onDinerTipChange(person.name, parseInt(e.target.value, 10))}
                                                 className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                                                disabled={isSettled}
+                                                disabled={isSettled || gratuityIncluded}
                                             />
                                         </div>
                                         

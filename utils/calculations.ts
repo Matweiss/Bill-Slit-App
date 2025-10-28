@@ -3,7 +3,7 @@ import { Bill, PersonTotal } from '../types';
 export const calculateTotalsForBill = (bill: Bill): PersonTotal[] => {
     if (!bill.parsedReceipt) return [];
 
-    const { parsedReceipt, assignments, diners, dinerTips } = bill;
+    const { parsedReceipt, assignments, diners, dinerTips, gratuityIncluded } = bill;
 
     const personTotals: { [key: string]: { subtotal: number } } = {};
     const allPeople = new Set<string>(diners);
@@ -30,7 +30,7 @@ export const calculateTotalsForBill = (bill: Bill): PersonTotal[] => {
     return Object.entries(personTotals).map(([name, totals]) => {
         const proportion = parsedReceipt.subtotal > 0 ? totals.subtotal / parsedReceipt.subtotal : 0;
         const tax = proportion * parsedReceipt.tax;
-        const tipPercentageForDiner = dinerTips[name] ?? 18;
+        const tipPercentageForDiner = gratuityIncluded ? 0 : (dinerTips[name] ?? 18);
         const tip = totals.subtotal * (tipPercentageForDiner / 100);
 
         return {
